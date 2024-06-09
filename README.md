@@ -12,5 +12,6 @@ docker-compose -f docker-compose.test.yml up --build
 
 ### サーバーとクライアントのログを確認
 docker-compose logs
+
 docker-compose -f docker-compose.test.yml logs
 
