@@ -8,11 +8,19 @@ from grpc import ssl_server_credentials
 import os
 
 # シークレットキーのパスを環境変数から取得
-secret_key_path = os.getenv('SECRET_KEY_PATH', 'server.key')
+secret_key_path = os.getenv('SECRET_KEY_PATH', '/home/user/server.key')
+crt_path = os.getenv('CRT_PATH', '/home/user/server.crt')
 
 # シークレットキーを読み込み
 with open(secret_key_path, 'rb') as f:
     secret_key = f.read()
+
+with open(crt_path, 'rb') as f:
+    certificate_chain = f.read()
+
+server_credentials = grpc.ssl_server_credentials(
+    ((secret_key, certificate_chain),)
+)
 
 # ロギングの設定
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -47,11 +55,11 @@ def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     api_pb2_grpc.add_DayTimeServicer_to_server(DayTimeServicer(), server)
     # TLS設定の追加
-    with open('server.crt', 'rb') as f:
-        server_cert = f.read()
-    with open('server.key', 'rb') as f:
-        server_key = f.read()
-    server_credentials = ssl_server_credentials([(server_key, server_cert)])
+    # with open('server.crt', 'rb') as f:
+    #     server_cert = f.read()
+    # with open('server.key', 'rb') as f:
+    #     server_key = f.read()
+    # server_credentials = ssl_server_credentials([(server_key, server_cert)])
     server.add_secure_port('[::]:50051', server_credentials)
 
     logging.info("Server started at port 50051")

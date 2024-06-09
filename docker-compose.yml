@@ -6,7 +6,13 @@ services:
     ports:
       - "50051:50051"
     env_file:
-      - ../.env
+      - .env
+    volumes:
+      - ./server/server.key:/home/user/server.key
+      - ./server/server.crt:/home/user/server.crt
+    environment:
+      - SECRET_KEY_PATH=/home/user/server.key
+      - CRT_PATH=/home/user/server.crt
 
   client:
     build:
@@ -14,7 +20,10 @@ services:
     depends_on:
       - server
     env_file:
-      - ../.env
+      - .env
+    environment:
+      - SERVER_HOST=server  # 環境変数でサーバーのホスト名を指定
+    command: sh -c "sleep 10 && python3 client.py"  # サーバーが起動するまで待機
 
 volumes:
   data-volume:
