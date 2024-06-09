@@ -16,3 +16,6 @@ docker-compose logs
 
 docker-compose -f docker-compose.test.yml logs
 
+
+### サーバの証明書の作成
+openssl req -newkey rsa:2048 -nodes -keyout server.key -x509 -days 365 -out server.crt -subj "/CN=server"
