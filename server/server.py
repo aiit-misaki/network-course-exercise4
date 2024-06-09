@@ -5,6 +5,14 @@ import api_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
 import logging
 from grpc import ssl_server_credentials
+import os
+
+# シークレットキーのパスを環境変数から取得
+secret_key_path = os.getenv('SECRET_KEY_PATH', 'server.key')
+
+# シークレットキーを読み込み
+with open(secret_key_path, 'rb') as f:
+    secret_key = f.read()
 
 # ロギングの設定
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')

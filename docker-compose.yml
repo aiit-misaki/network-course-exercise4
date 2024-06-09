@@ -4,23 +4,17 @@ services:
     build:
       context: ./server
     ports:
-      - "50051:50051"  # gRPCの標準ポートを使用
-    volumes:
-      - data-volume:/data  # データ永続化が必要な場合に使用
-    depends_on:
-      - init
+      - "50051:50051"
+    env_file:
+      - ../.env
 
   client:
     build:
       context: ./client
     depends_on:
       - server
-
-  init:
-    image: ubuntu:jammy
-    volumes:
-      - data-volume:/data
-    command: /bin/sh -c "chown -R 1000:1000 /data"
+    env_file:
+      - ../.env
 
 volumes:
   data-volume:
