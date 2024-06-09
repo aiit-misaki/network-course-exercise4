@@ -1,0 +1,38 @@
+FROM ubuntu:jammy
+
+# Replace 1000 with your user / group id
+ARG uid=1000
+ARG gid=1000
+ARG user=user
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Tokyo
+
+RUN apt update && apt upgrade -y && apt install -y tzdata sudo net-tools binutils file git vim \
+    telnet netcat wget curl lsof iputils-ping iproute2 ethtool traceroute python3 python3-pip protobuf-compiler
+
+RUN pip3 install grpcio grpcio-tools pytest
+
+RUN groupadd -g ${uid} ${user} && \
+    useradd -u ${gid} -g ${user} -G sudo -r ${user} -s /bin/bash && \
+    echo 'Defaults visiblepw' >> /etc/sudoers && \
+    echo ${user} ' ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+    mkdir /home/${user} && \
+    chown ${uid}:${gid} -R /home/${user}
+
+USER ${user}
+WORKDIR /home/${user}
+
+COPY --chown=${uid}:${gid} ./server /home/user/server
+COPY --chown=${uid}:${gid} ./api.proto /home/user/api.proto
+COPY --chown=${uid}:${gid} ./tests /home/user/tests
+
+RUN chmod 600 /home/user/server/server.key
+
+# Generate the gRPC code from the proto file
+RUN python3 -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. api.proto
+
+# Set the PYTHONPATH environment variable
+ENV PYTHONPATH=$PYTHONPATH:/home/user
+
+CMD ["pytest", "/home/user/tests"]

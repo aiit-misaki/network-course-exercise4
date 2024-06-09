@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package grpc_api;
+
+import "google/protobuf/timestamp.proto";
+
+service DayTime {
+    rpc daytime(TimeZoneRequest) returns (DayTimeResponse);
+    rpc timestamp(TimestampRequest) returns (TimestampResponse);
+    rpc set(Value) returns (PreviousValue);
+    rpc get(Empty) returns (Value);
+}
+
+message TimeZoneRequest {
+    string timezone = 1;
+}
+
+message DayTimeResponse {
+    string daytime = 1;
+}
+
+message TimestampRequest {}
+
+message TimestampResponse {
+    google.protobuf.Timestamp timestamp = 1;
+}
+
+message Value {
+    string data = 1;
+}
+
+message PreviousValue {
+    string data = 1;
+}
+
+message Empty {}

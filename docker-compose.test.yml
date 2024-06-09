@@ -1,0 +1,21 @@
+version: '3'
+services:
+  server:
+    build:
+      context: ./server
+    ports:
+      - "50051:50051"
+    volumes:
+      - ./server/server.crt:/home/user/server.crt
+      - ./server/server.key:/home/user/server.key
+
+  test:
+    build:
+      context: .
+      dockerfile: ./tests/Dockerfile.test
+    depends_on:
+      - server
+    volumes:
+      - ./server:/home/user/server
+      - ./api.proto:/home/user/api.proto
+      - ./tests:/home/user/tests
